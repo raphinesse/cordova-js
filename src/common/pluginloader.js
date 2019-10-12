@@ -19,6 +19,7 @@
  *
 */
 
+var cdvModules = require('cordova/modules');
 var modulemapper = require('cordova/modulemapper');
 
 // Helper function to inject a <script> tag.
@@ -35,11 +36,11 @@ exports.injectScript = function (url, onload, onerror) {
 
 function injectIfNecessary (id, url, onload, onerror) {
     onerror = onerror || onload;
-    if (id in define.moduleMap) {
+    if (id in cdvModules.define.moduleMap) {
         onload();
     } else {
         exports.injectScript(url, function () {
-            if (id in define.moduleMap) {
+            if (id in cdvModules.define.moduleMap) {
                 onload();
             } else {
                 onerror();
@@ -119,7 +120,7 @@ exports.load = function (callback) {
         pathPrefix = '';
     }
     injectIfNecessary('cordova/plugin_list', pathPrefix + 'cordova_plugins.js', function () {
-        var moduleList = require('cordova/plugin_list');
+        var moduleList = cdvModules.require('cordova/plugin_list');
         handlePluginsObject(pathPrefix, moduleList, callback);
     }, callback);
 };

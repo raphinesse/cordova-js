@@ -19,4 +19,30 @@
  *
 */
 
-require('cordova/init');
+var cdvModules = require('cordova/modules');
+
+function makeRuntimeModule (id, exports) {
+    cdvModules.define(id, function (r, e, m) { m.exports = exports; });
+}
+
+// Make all modules accessible during run time
+makeRuntimeModule('cordova', require('cordova'));
+makeRuntimeModule('cordova/argscheck', require('cordova/argscheck'));
+makeRuntimeModule('cordova/base64', require('cordova/base64'));
+makeRuntimeModule('cordova/builder', require('cordova/builder'));
+makeRuntimeModule('cordova/channel', require('cordova/channel'));
+makeRuntimeModule('cordova/exec/proxy', require('cordova/exec/proxy'));
+makeRuntimeModule('cordova/init', require('cordova/init'));
+makeRuntimeModule('cordova/modulemapper', require('cordova/modulemapper'));
+makeRuntimeModule('cordova/pluginloader', require('cordova/pluginloader'));
+makeRuntimeModule('cordova/urlutil', require('cordova/urlutil'));
+makeRuntimeModule('cordova/utils', require('cordova/utils'));
+
+// FIXME these have to be injected by platforms
+makeRuntimeModule('cordova/platform', require('cordova/platform'));
+makeRuntimeModule('cordova/exec', require('cordova/exec'));
+
+// Initialize App
+require('cordova/init')();
+
+module.exports = require('cordova');

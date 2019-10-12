@@ -19,7 +19,8 @@
 */
 
 var builder = require('cordova/builder');
-var moduleMap = define.moduleMap;
+var cdvModules = require('cordova/modules');
+var moduleMap = cdvModules.define.moduleMap;
 var symbolList;
 var deprecationMap;
 
@@ -70,7 +71,7 @@ exports.mapModules = function (context) {
     for (var i = 0, len = symbolList.length; i < len; i += 3) {
         var strategy = symbolList[i];
         var moduleName = symbolList[i + 1];
-        var module = require(moduleName);
+        var module = cdvModules.require(moduleName);
         // <runs/>
         if (strategy === 'r') {
             continue;

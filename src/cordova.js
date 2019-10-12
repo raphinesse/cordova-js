@@ -27,6 +27,7 @@ if (window.cordova && !(window.cordova instanceof HTMLElement)) {
 
 var channel = require('cordova/channel');
 var platform = require('cordova/platform');
+var cdvModules = require('cordova/modules');
 
 /**
  * Intercept calls to addEventListener + removeEventListener and handle deviceready,
@@ -95,8 +96,8 @@ function createEvent (type, data) {
 }
 
 var cordova = {
-    define: define,
-    require: require,
+    define: cdvModules.define,
+    require: cdvModules.require,
     version: PLATFORM_VERSION_BUILD_LABEL,
     platformVersion: PLATFORM_VERSION_BUILD_LABEL,
     platformId: platform.id,
