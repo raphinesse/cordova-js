@@ -71,7 +71,10 @@
   "dependencies": {
     "execa": "^1.0.0",
     "fs-extra": "^8.0.1",
-    "globby": "^9.2.0"
+    "globby": "^9.2.0",
+    "rollup": "^1.23.1",
+    "rollup-plugin-alias": "^2.0.1",
+    "rollup-plugin-commonjs": "^10.1.0"
   },
   "devDependencies": {
     "cordova-android": "^8.0.0",
