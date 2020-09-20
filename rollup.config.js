@@ -1,72 +1,29 @@
-import { resolve } from 'path';
-import commonjs from '@rollup/plugin-commonjs';
-import alias from '@rollup/plugin-alias';
+const path = require('path');
+const makeRollupConfig = require('./build-tools/rollup-config');
+const { collectModules } = require('./build-tools/common');
 
-// FIXME this will destroy source maps
-function stripLicenseHeader () {
-    const LICENSE_REGEX = /^\s*\/\*[\s\S]+?\*\/\s*/;
-    return {
-        transform (code) {
-            return code.replace(LICENSE_REGEX, '');
-        }
-    };
+module.exports = makeRollupConfig({
+    platformName: 'test',
+    platformVersion: 'N/A',
+    extraModules: collectTestBuildModules()
+});
+
+function collectTestBuildModules () {
+    // Add platform-specific modules that have tests to the test bundle.
+    const platformModules = ['android', 'ios'].map(platform => {
+        const platformPath = path.dirname(require.resolve(`cordova-${platform}/package`));
+        const modulePath = path.join(platformPath, 'cordova-js-src');
+        const modules = collectModules(modulePath);
+
+        // Prevent overwriting this platform's exec module with the next one
+        const moduleId = path.posix.join(platform, 'exec');
+        modules[moduleId] = Object.assign({}, modules.exec, { moduleId });
+
+        return modules;
+    });
+
+    // Finally, add modules provided by test platform
+    const testModulesPath = path.join(__dirname, 'test/test-platform-modules');
+    // return Object.assign(...platformModules, collectModules(testModulesPath));
+    return collectModules(testModulesPath);
 }
-
-const LICENSE = `
-/*
- Licensed to the Apache Software Foundation (ASF) under one
- or more contributor license agreements.  See the NOTICE file
- distributed with this work for additional information
- regarding copyright ownership.  The ASF licenses this file
- to you under the Apache License, Version 2.0 (the
- "License"); you may not use this file except in compliance
- with the License.  You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing,
- software distributed under the License is distributed on an
- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- KIND, either express or implied.  See the License for the
- specific language governing permissions and limitations
- under the License.
-*/
-`.trim();
-
-export default {
-    input: 'src/scripts/bootstrap.js',
-    output: {
-        file: 'pkg/cordova.test.js',
-        format: 'iife',
-        name: 'cordova',
-        banner: LICENSE,
-        // FIXME inject correct version
-        intro: 'var PLATFORM_VERSION_BUILD_LABEL = "1.2.3";'
-    },
-    plugins: [
-        stripLicenseHeader(),
-        alias({
-            entries: [
-                // FIXME inject proper platform modules
-                {
-                    find: /^cordova\/(exec|platform)$/,
-                    replacement: resolve('test/test-platform-modules/$1.js')
-                },
-
-                {
-                    find: 'cordova/modules',
-                    replacement: resolve('src/scripts/require.js')
-                },
-                {
-                    find: /^cordova\/(.*)/,
-                    replacement: resolve('src/common/$1.js')
-                },
-                {
-                    find: 'cordova',
-                    replacement: resolve('src/cordova.js')
-                }
-            ]
-        }),
-        commonjs()
-    ]
-};
