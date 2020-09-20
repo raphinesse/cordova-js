@@ -24,6 +24,5 @@ function collectTestBuildModules () {
 
     // Finally, add modules provided by test platform
     const testModulesPath = path.join(__dirname, 'test/test-platform-modules');
-    // return Object.assign(...platformModules, collectModules(testModulesPath));
-    return collectModules(testModulesPath);
+    return Object.assign(...platformModules, collectModules(testModulesPath));
 }

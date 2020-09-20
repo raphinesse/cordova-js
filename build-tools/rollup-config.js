@@ -33,6 +33,7 @@ module.exports = async userConfig => {
                     }
                 ]
             }),
+            fixCordovaIosExec(),
             commonjs()
         ]
     };
@@ -96,6 +97,19 @@ function stripLicenseHeader () {
     return {
         transform (code) {
             return code.replace(LICENSE_REGEX, '');
+        }
+    };
+}
+
+function fixCordovaIosExec () {
+    const REQ_REGEX = /var cexec = require\('cordova\/exec'\)/;
+    return {
+        transform (code, id) {
+            if (!id.endsWith('ios/cordova-js-src/exec.js')) return null;
+            return code.replace(
+                REQ_REGEX,
+                "var cexec = require('cordova/modules').require('cordova/exec')"
+            );
         }
     };
 }
