@@ -8,6 +8,7 @@ module.exports = makeRollupConfig({
     platformVersion: 'N/A',
     extraModules: collectTestBuildModules()
 }).then(config => {
+    config.output.file = path.join(__dirname, 'pkg/cordova.test.js');
     config.plugins.push(istanbul({
         exclude: ['test/**/*.js']
     }));
