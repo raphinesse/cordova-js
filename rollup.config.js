@@ -1,11 +1,17 @@
 const path = require('path');
 const makeRollupConfig = require('./build-tools/rollup-config');
 const { collectModules } = require('./build-tools/common');
+const istanbul = require('rollup-plugin-istanbul');
 
 module.exports = makeRollupConfig({
     platformName: 'test',
     platformVersion: 'N/A',
     extraModules: collectTestBuildModules()
+}).then(config => {
+    config.plugins.push(istanbul({
+        exclude: ['test/**/*.js']
+    }));
+    return config;
 });
 
 function collectTestBuildModules () {
